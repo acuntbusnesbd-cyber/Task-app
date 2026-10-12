@@ -2,9 +2,9 @@ name: Build Android APK
 
 on:
   push:
-    branches: [ "**" ] # Trigger on all branches (main, master, etc.)
+    branches: [ "**" ]
   pull_request:
-  workflow_dispatch:   # Allows manual button click on GitHub to build APK
+  workflow_dispatch:
 
 jobs:
   build:
@@ -21,10 +21,15 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Setup Gradle 8.11.1
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android Licenses
+        run: |
+          yes | sdkmanager --licenses || true
+
+      - name: Set up Gradle Cache
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.11.1'
 
       - name: Setup Keystore and Environment
         run: |
@@ -36,9 +41,10 @@ jobs:
           if [ ! -f .env ]; then
             cp .env.example .env 2>/dev/null || touch .env
           fi
+          chmod +x ./gradlew
 
-      - name: Build Debug APK
-        run: gradle :app:assembleDebug --no-daemon --stacktrace
+      - name: Build Debug APK with Gradle Wrapper
+        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
