@@ -21,30 +21,37 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Accept Android Licenses
+      - name: Prepare Keystore, Licenses, and Environment
         run: |
-          yes | sdkmanager --licenses || true
+          # Setup Android SDK environment
+          export ANDROID_HOME=${ANDROID_HOME:-/usr/local/lib/android/sdk}
+          mkdir -p "$ANDROID_HOME/licenses"
+          echo -e "24333f8a63b6825ea9c5514f83c2829b004d1fee\nd56f5187479451eabf01fb78af6dfcb131a6481e\n84831b9409646a918e30573bab4c9c91346d8abd\n79124426920f4f14ab503d368d33a2b429d81e33" > "$ANDROID_HOME/licenses/android-sdk-license"
+          echo -e "84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
 
-      - name: Set up Gradle Cache
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Setup Keystore and Environment
-        run: |
+          # Restore debug keystore
           if [ -f debug.keystore.base64 ]; then
             base64 -d debug.keystore.base64 > debug.keystore
-          else
+          fi
+          if [ ! -f debug.keystore ]; then
             keytool -genkey -v -keystore debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
           fi
+
+          # Environment configuration
           if [ ! -f .env ]; then
             cp .env.example .env 2>/dev/null || touch .env
           fi
+
+          # Executable permission for Gradle Wrapper
           chmod +x ./gradlew
 
-      - name: Build Debug APK with Gradle Wrapper
-        run: ./gradlew :app:assembleDebug --no-daemon --stacktrace
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-disabled: false
+
+      - name: Build Debug APK
+        run: ./gradlew :app:assembleDebug --stacktrace --no-daemon
 
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
