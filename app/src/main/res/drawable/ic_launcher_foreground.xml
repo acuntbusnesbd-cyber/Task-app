@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Timetable card base with shadow/inset -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,26 h48 c3.3,0 6,2.7 6,6 v44 c0,3.3 -2.7,6 -6,6 H30 c-3.3,0 -6,-2.7 -6,-6 V32 c0,-3.3 2.7,-6 6,-6 z" />
+    <!-- Header bar on card -->
+    <path
+        android:fillColor="#FFB300"
+        android:pathData="M24,32 c0,-3.3 2.7,-6 6,-6 h48 c3.3,0 6,2.7 6,6 v10 H24 Z" />
+    <!-- Calendar rings/tabs -->
+    <path
+        android:fillColor="#1E3A8A"
+        android:pathData="M35,22 h4 v7 h-4 z M52,22 h4 v7 h-4 z M69,22 h4 v7 h-4 z" />
+    <!-- Routine table slots/lines -->
+    <path
+        android:fillColor="#E2E8F0"
+        android:pathData="M32,49 h26 v5 H32 z M32,58 h26 v5 H32 z M32,67 h26 v5 H32 z" />
+    <!-- Clock circle badge -->
+    <path
+        android:fillColor="#0284C7"
+        android:pathData="M70,64 m-10,0 a10,10 0 1,0 20,0 a10,10 0 1,0 -20,0" />
+    <!-- Clock hands -->
+    <path
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M70,64 v-5 M70,64 h4" />
+    <!-- Electrical flash symbol on routine -->
+    <path
+        android:fillColor="#FF6F00"
+        android:pathData="M48,47 l-5,11 h6 l-2,10 7,-12 h-6 z" />
+</vector>

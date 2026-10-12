@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">CGPI Class Routine</string>
+    <string name="section_a1">First Shift - A1</string>
+    <string name="section_b1">First Shift - B1</string>
+    <string name="institute_name">Chattogram Govt. Polytechnic Institute</string>
+    <string name="department_name">Electrical Technology • 1st Semester</string>
+</resources>

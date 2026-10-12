@@ -1,0 +1,6 @@
+{
+  "name": "CGPI Class Routine",
+  "description": "Chattogram Polytechnic Electrical Technology A1 and B1 class routine, teacher directory with direct call, daily tasks, and class notifications.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
