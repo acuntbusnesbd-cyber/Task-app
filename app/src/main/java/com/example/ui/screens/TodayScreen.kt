@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -55,6 +56,7 @@ fun TodayScreen(
   val currentMinutes by viewModel.currentMinutes.collectAsState()
   val remindersEnabled by viewModel.remindersEnabled.collectAsState()
   val minutesBefore by viewModel.minutesBefore.collectAsState()
+  val developerInfo by viewModel.developerInfo.collectAsState()
 
   val (activeClass, nextClass) = viewModel.getCurrentAndNextClass(selectedSection)
   val dayClasses = viewModel.getRoutineForDay(selectedSection, selectedDay)
@@ -134,6 +136,31 @@ fun TodayScreen(
           nextClass = nextClass,
           currentMinutes = currentMinutes
         )
+      }
+
+      if (developerInfo.showAnnouncement && developerInfo.announcement.isNotBlank()) {
+        item {
+          androidx.compose.material3.Card(
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
+            colors = androidx.compose.material3.CardDefaults.cardColors(
+              containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+            )
+          ) {
+            Row(
+              modifier = Modifier.padding(12.dp),
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Text(text = "📢", fontSize = 16.sp)
+              Spacer(modifier = Modifier.width(8.dp))
+              Text(
+                text = developerInfo.announcement,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                fontWeight = FontWeight.Medium
+              )
+            }
+          }
+        }
       }
 
       // Day Header & Count

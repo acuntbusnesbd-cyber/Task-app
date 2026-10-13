@@ -45,6 +45,10 @@ import com.example.ui.screens.WeeklyRoutineScreen
 import com.example.ui.theme.MyApplicationTheme
 import com.example.viewmodel.RoutineViewModel
 
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Person
+import com.example.ui.screens.DeveloperScreen
+
 enum class AppNavDestination(
   val label: String,
   val selectedIcon: ImageVector,
@@ -54,7 +58,8 @@ enum class AppNavDestination(
   TODAY("Today", Icons.Filled.Today, Icons.Outlined.Today, "nav_today"),
   TIMETABLE("Timetable", Icons.Filled.CalendarMonth, Icons.Outlined.CalendarMonth, "nav_timetable"),
   TASKS("Tasks", Icons.Filled.Assignment, Icons.Outlined.Assignment, "nav_tasks"),
-  TEACHERS("Teachers", Icons.Filled.ContactPhone, Icons.Outlined.ContactPhone, "nav_teachers")
+  TEACHERS("Teachers", Icons.Filled.ContactPhone, Icons.Outlined.ContactPhone, "nav_teachers"),
+  DEVELOPER("Developer", Icons.Filled.Person, Icons.Outlined.Person, "nav_developer")
 }
 
 class MainActivity : ComponentActivity() {
@@ -149,6 +154,14 @@ fun MainApp(viewModel: RoutineViewModel) {
 
       AppNavDestination.TEACHERS -> {
         TeacherDirectoryScreen(
+          viewModel = viewModel,
+          modifier = Modifier.padding(innerPadding)
+        )
+      }
+
+      AppNavDestination.DEVELOPER -> {
+        DeveloperScreen(
+          viewModel = viewModel,
           modifier = Modifier.padding(innerPadding)
         )
       }

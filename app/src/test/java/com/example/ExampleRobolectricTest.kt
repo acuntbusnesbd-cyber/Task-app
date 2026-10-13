@@ -50,4 +50,12 @@ class ExampleRobolectricTest {
     val controller = org.robolectric.Robolectric.buildActivity(MainActivity::class.java).setup()
     assertNotNull(controller.get())
   }
+
+  @Test
+  fun `verify admin password authentication`() {
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    assertTrue(com.example.data.local.AdminManager.checkPassword("272426"))
+    org.junit.Assert.assertFalse(com.example.data.local.AdminManager.checkPassword("123456"))
+    org.junit.Assert.assertFalse(com.example.data.local.AdminManager.checkPassword(""))
+  }
 }

@@ -3,12 +3,14 @@ package com.example.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.data.local.AdminManager
 import com.example.data.local.AppDatabase
+import com.example.data.local.DeveloperInfo
 import com.example.data.local.TaskEntity
 import com.example.data.model.ClassRoutineItem
 import com.example.data.model.RoutineDay
 import com.example.data.model.RoutineSection
-import com.example.data.repository.RoutineRepository
+import com.example.data.model.TeacherInfo
 import com.example.notification.NotificationHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,6 +52,19 @@ class RoutineViewModel(application: Application) : AndroidViewModel(application)
   )
   val minutesBefore: StateFlow<Int> = _minutesBefore.asStateFlow()
 
+  // Developer & Admin State
+  private val _developerInfo = MutableStateFlow(AdminManager.getDeveloperInfo(context))
+  val developerInfo: StateFlow<DeveloperInfo> = _developerInfo.asStateFlow()
+
+  private val _teachers = MutableStateFlow(AdminManager.getTeachers(context))
+  val teachers: StateFlow<List<TeacherInfo>> = _teachers.asStateFlow()
+
+  private val _routineList = MutableStateFlow(AdminManager.getRoutineList(context))
+  val routineList: StateFlow<List<ClassRoutineItem>> = _routineList.asStateFlow()
+
+  private val _isAdminUnlocked = MutableStateFlow(false)
+  val isAdminUnlocked: StateFlow<Boolean> = _isAdminUnlocked.asStateFlow()
+
   val tasks: StateFlow<List<TaskEntity>> = taskDao.getAllTasksFlow()
     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -85,13 +100,18 @@ class RoutineViewModel(application: Application) : AndroidViewModel(application)
   }
 
   fun getRoutineForDay(section: RoutineSection, day: RoutineDay): List<ClassRoutineItem> {
-    return RoutineRepository.getRoutineForDay(section, day)
+    return _routineList.value.filter { it.section == section && it.day == day }
   }
 
   fun getCurrentAndNextClass(section: RoutineSection): Pair<ClassRoutineItem?, ClassRoutineItem?> {
     val cal = Calendar.getInstance()
-    val todayRoutineDay = RoutineDay.fromCalendarDay(cal.get(Calendar.DAY_OF_WEEK))
-    return RoutineRepository.getCurrentAndNextClass(section, todayRoutineDay, _currentMinutes.value)
+    val todayRoutineDay = RoutineDay.fromCalendarDay(cal.get(Calendar.DAY_OF_WEEK)) ?: return Pair(null, null)
+    val dayClasses = getRoutineForDay(section, todayRoutineDay).filter { !it.isFreePeriod }
+
+    val current = dayClasses.find { _currentMinutes.value in it.startMinutes until it.endMinutes }
+    val next = dayClasses.filter { it.startMinutes > _currentMinutes.value }.minByOrNull { it.startMinutes }
+
+    return Pair(current, next)
   }
 
   fun isToday(day: RoutineDay): Boolean {
@@ -146,6 +166,47 @@ class RoutineViewModel(application: Application) : AndroidViewModel(application)
 
   fun triggerTestNotification() {
     NotificationHelper.sendTestNotification(context, _selectedSection.value)
+  }
+
+  // --- Admin Methods ---
+  fun unlockAdmin(pin: String): Boolean {
+    val valid = AdminManager.checkPassword(pin)
+    if (valid) {
+      _isAdminUnlocked.value = true
+    }
+    return valid
+  }
+
+  fun lockAdmin() {
+    _isAdminUnlocked.value = false
+  }
+
+  fun updateDeveloperInfo(info: DeveloperInfo) {
+    AdminManager.saveDeveloperInfo(context, info)
+    _developerInfo.value = info
+  }
+
+  fun updateTeacher(teacher: TeacherInfo) {
+    AdminManager.saveTeacher(context, teacher)
+    _teachers.value = AdminManager.getTeachers(context)
+  }
+
+  fun updateClassItem(item: ClassRoutineItem) {
+    AdminManager.saveClassItem(context, item)
+    _routineList.value = AdminManager.getRoutineList(context)
+    if (_remindersEnabled.value) {
+      NotificationHelper.scheduleWeeklyReminders(context, _selectedSection.value, _minutesBefore.value)
+    }
+  }
+
+  fun resetAllAdminOverrides() {
+    AdminManager.resetAllToDefault(context)
+    _developerInfo.value = AdminManager.getDeveloperInfo(context)
+    _teachers.value = AdminManager.getTeachers(context)
+    _routineList.value = AdminManager.getRoutineList(context)
+    if (_remindersEnabled.value) {
+      NotificationHelper.scheduleWeeklyReminders(context, _selectedSection.value, _minutesBefore.value)
+    }
   }
 
   private fun getInitialRoutineDay(): RoutineDay {

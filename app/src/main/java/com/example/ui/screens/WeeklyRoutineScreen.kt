@@ -162,7 +162,7 @@ fun WeeklyRoutineScreen(
       }
 
       val activeDay = days[selectedTabDayIndex]
-      val activeClasses = RoutineRepository.getRoutineForDay(selectedSection, activeDay)
+      val activeClasses = viewModel.getRoutineForDay(selectedSection, activeDay)
 
       LazyColumn(
         modifier = Modifier

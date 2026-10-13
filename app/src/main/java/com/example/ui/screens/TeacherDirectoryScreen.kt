@@ -57,14 +57,18 @@ import com.example.data.repository.RoutineRepository
 import com.example.ui.components.dialPhone
 import com.example.ui.components.sendSms
 
+import androidx.compose.runtime.collectAsState
+import com.example.viewmodel.RoutineViewModel
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TeacherDirectoryScreen(
+  viewModel: RoutineViewModel,
   modifier: Modifier = Modifier
 ) {
   val context = LocalContext.current
   var searchQuery by remember { mutableStateOf("") }
-  val teachers = RoutineRepository.teachers
+  val teachers by viewModel.teachers.collectAsState()
 
   val filteredTeachers = teachers.filter {
     it.name.contains(searchQuery, ignoreCase = true) ||
